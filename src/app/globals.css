@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Identidade visual: "lombada de livro".
+  Azul-tinta (navegação/ação), verde-lombada (apoio), amarelo-marca-página (destaque).
+  Fundo em cinza-papel frio; superfícies planas com borda fina, sem sombras pesadas.
+*/
+@layer base {
+  :root {
+    --background: 205 28% 96%;
+    --foreground: 210 40% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 210 40% 12%;
+    --primary: 208 56% 20%;
+    --primary-foreground: 205 40% 98%;
+    --secondary: 205 24% 92%;
+    --secondary-foreground: 208 56% 20%;
+    --muted: 205 22% 93%;
+    --muted-foreground: 210 14% 38%;
+    --accent: 41 88% 56%;
+    --accent-foreground: 36 80% 12%;
+    --destructive: 4 70% 46%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 205 20% 86%;
+    --input: 205 18% 80%;
+    --ring: 176 62% 30%;
+    --radius: 0.75rem;
+
+    --success: 152 58% 28%;
+    --success-soft: 152 45% 92%;
+    --warning: 33 90% 30%;
+    --warning-soft: 43 95% 90%;
+    --info: 208 70% 36%;
+    --info-soft: 208 70% 93%;
+    --danger: 4 70% 42%;
+    --danger-soft: 4 80% 94%;
+
+    --sidebar: 208 56% 16%;
+    --sidebar-foreground: 205 30% 92%;
+    --sidebar-muted: 208 30% 60%;
+  }
+
+  * { @apply border-border; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+  h1, h2, h3 { @apply font-display tracking-tight; }
+  :focus-visible { @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background; }
+}
+
+/* Animações de diálogo (respondem à ação do usuário) */
+@keyframes overlay-in { from { opacity: 0 } to { opacity: 1 } }
+@keyframes dialog-in { from { opacity: 0; transform: translate(-50%, -48%) scale(.98) } to { opacity: 1; transform: translate(-50%, -50%) scale(1) } }
+@keyframes drawer-in { from { transform: translateX(-100%) } to { transform: translateX(0) } }
+[data-state="open"].dialog-overlay { animation: overlay-in .15s ease-out; }
+[data-state="open"].dialog-content { animation: dialog-in .18s ease-out; }
+.drawer-in { animation: drawer-in .2s ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+
+@media print {
+  body { background: white !important; }
+  .no-print { display: none !important; }
+  @page { margin: 12mm; }
+}
