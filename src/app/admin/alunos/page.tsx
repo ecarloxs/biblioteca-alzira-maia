@@ -78,7 +78,7 @@ export default async function Page({ searchParams }: { searchParams: SearchParam
                   <TD className="text-right">
                     <div className="flex justify-end gap-2">
                       <AlunoEditDialog aluno={a} turmas={turmas} />
-                      <ToggleAtivoButton ativo={a.ativo} nome={a.nome} onToggle={(v) => setAlunoAtivo(a.id, v)} />
+                      <ToggleAtivoButton ativo={a.ativo} nome={a.nome} onToggle={setAlunoAtivo.bind(null, a.id)} />
                     </div>
                   </TD>
                 </TR>

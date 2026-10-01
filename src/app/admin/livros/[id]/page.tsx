@@ -41,7 +41,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
             </div>
             <div className="flex flex-wrap gap-2">
               <LivroFormDialog livro={livro} />
-              <ToggleAtivoButton ativo={livro.ativo} nome={livro.titulo} onToggle={(v) => setLivroAtivo(livro.id, v)} />
+              <ToggleAtivoButton ativo={livro.ativo} nome={livro.titulo} onToggle={setLivroAtivo.bind(null, livro.id)} />
             </div>
           </div>
           <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-1.5 text-sm sm:grid-cols-3">

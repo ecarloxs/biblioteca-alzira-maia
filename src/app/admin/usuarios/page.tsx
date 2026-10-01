@@ -86,7 +86,7 @@ export default async function Page({ searchParams }: { searchParams: SearchParam
                   <TD className="text-right">
                     <div className="flex flex-wrap justify-end gap-2">
                       <ResetPasswordDialog profileId={u.id} nome={u.nome} />
-                      <ToggleAtivoButton ativo={u.ativo} nome={u.nome} onToggle={(v) => setUsuarioAtivo(u.id, v)} />
+                      <ToggleAtivoButton ativo={u.ativo} nome={u.nome} onToggle={setUsuarioAtivo.bind(null, u.id)} />
                     </div>
                   </TD>
                 </TR>

@@ -79,7 +79,7 @@ export default async function Page() {
                           turmas={turmas}
                           vinculadas={p.professor_turmas.map((pt) => pt.turma_id)}
                         />
-                        <ToggleAtivoButton ativo={p.ativo} nome={p.profiles?.nome ?? ""} onToggle={(v) => setProfessorAtivo(p.id, v)} />
+                        <ToggleAtivoButton ativo={p.ativo} nome={p.profiles?.nome ?? ""} onToggle={setProfessorAtivo.bind(null, p.id)} />
                       </div>
                     </TD>
                   </TR>

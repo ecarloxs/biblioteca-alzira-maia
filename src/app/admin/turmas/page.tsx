@@ -47,7 +47,7 @@ export default async function Page() {
                   <TD className="text-right">
                     <div className="flex justify-end gap-2">
                       <TurmaFormDialog turma={t} />
-                      <ToggleAtivoButton ativo={t.ativo} nome={t.nome} onToggle={(v) => setTurmaAtiva(t.id, v)} />
+                      <ToggleAtivoButton ativo={t.ativo} nome={t.nome} onToggle={setTurmaAtiva.bind(null, t.id)} />
                     </div>
                   </TD>
                 </TR>
