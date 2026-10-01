@@ -15,13 +15,14 @@ export async function CatalogPage({ basePath, searchParams }: { basePath: string
   const q = first(sp.q);
   const categoria = first(sp.categoria);
   const disp = first(sp.disp);
+  const avaliacao = first(sp.avaliacao);
   const ordem = first(sp.ordem);
   const page = Number(first(sp.page)) || 1;
 
   const supabase = await createClient();
   await supabase.rpc("manutencao_periodica"); // libera exemplares de reservas vencidas
   const [{ items, total }, categorias] = await Promise.all([
-    getCatalog(supabase, { q, categoria, disp, ordem, page }),
+    getCatalog(supabase, { q, categoria, disp, avaliacao, ordem, page }),
     getCategorias(supabase),
   ]);
 
@@ -43,6 +44,16 @@ export async function CatalogPage({ basePath, searchParams }: { basePath: string
             ],
           },
           {
+            name: "avaliacao",
+            label: "Avaliação mínima",
+            type: "select",
+            allLabel: "Qualquer avaliação",
+            options: [
+              { value: "4", label: "4 estrelas ou mais" },
+              { value: "3", label: "3 estrelas ou mais" },
+            ],
+          },
+          {
             name: "ordem",
             label: "Ordenar por",
             type: "select",
@@ -51,6 +62,8 @@ export async function CatalogPage({ basePath, searchParams }: { basePath: string
               { value: "autor", label: "Autor (A–Z)" },
               { value: "recentes", label: "Mais recentes" },
               { value: "disponiveis", label: "Mais disponíveis" },
+              { value: "avaliacao", label: "Melhor avaliados" },
+              { value: "populares", label: "Mais populares" },
             ],
           },
         ]}
@@ -68,7 +81,7 @@ export async function CatalogPage({ basePath, searchParams }: { basePath: string
           ))}
         </div>
       )}
-      <Pagination page={page} pageSize={PAGE_SIZE} total={total} basePath={basePath} params={{ q, categoria, disp, ordem }} />
+      <Pagination page={page} pageSize={PAGE_SIZE} total={total} basePath={basePath} params={{ q, categoria, disp, avaliacao, ordem }} />
     </>
   );
 }

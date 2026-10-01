@@ -25,6 +25,22 @@ export const EMPRESTIMO_STATUS: Record<string, { label: string; tone: Tone }> = 
   perdido: { label: "Perdido", tone: "danger" },
 };
 
+export const STATUS_GERAL_LIVRO: Record<string, { label: string; tone: Tone }> = {
+  disponivel: { label: "Disponível", tone: "success" },
+  emprestimo: { label: "Emprestado", tone: "info" },
+  indisponivel: { label: "Indisponível", tone: "danger" },
+};
+
+export const NOTIFICACAO_TIPO_ICON: Record<string, string> = {
+  reserva: "🔖",
+  prazo: "⏰",
+  devolucao: "✅",
+  avaliacao: "⭐",
+  conquista: "🏆",
+  atrasos: "⚠️",
+  sistema: "📚",
+};
+
 export const CONDICOES = [
   { value: "novo", label: "Novo" },
   { value: "bom", label: "Bom" },
@@ -92,6 +108,9 @@ export const ACAO_LABEL: Record<string, string> = {
   update_configuracoes: "Alterou configuração",
   insert_configuracoes: "Criou configuração",
   update_profiles: "Alterou usuário",
+  aluno_avaliou_livro: "Avaliou livro",
+  admin_removeu_avaliacao: "Removeu avaliação",
+  admin_restaurou_avaliacao: "Restaurou avaliação",
 };
 
 export const ENTIDADE_LABEL: Record<string, string> = {
@@ -106,6 +125,7 @@ export const ENTIDADE_LABEL: Record<string, string> = {
   turmas: "Turmas",
   configuracoes: "Configurações",
   profiles: "Usuários",
+  avaliacoes: "Avaliações",
 };
 
 export interface NavItem {
@@ -121,6 +141,8 @@ export const NAV: Record<Role, NavItem[]> = {
     { href: "/aluno/reservas", label: "Minhas reservas", icon: "bookmark" },
     { href: "/aluno/emprestimos", label: "Meus empréstimos", icon: "book-open" },
     { href: "/aluno/historico", label: "Histórico", icon: "history" },
+    { href: "/aluno/ranking", label: "Ranking de leitura", icon: "trophy" },
+    { href: "/aluno/conquistas", label: "Minhas conquistas", icon: "award" },
   ],
   professor: [
     { href: "/professor", label: "Início", icon: "home" },
@@ -128,6 +150,7 @@ export const NAV: Record<Role, NavItem[]> = {
     { href: "/professor/emprestimos", label: "Empréstimos", icon: "book-open" },
     { href: "/professor/atrasos", label: "Atrasos", icon: "alarm" },
     { href: "/professor/historico", label: "Histórico", icon: "history" },
+    { href: "/professor/avaliacoes", label: "Avaliações", icon: "star" },
     { href: "/professor/biblioteca", label: "Catálogo", icon: "library" },
   ],
   admin: [
@@ -137,6 +160,8 @@ export const NAV: Record<Role, NavItem[]> = {
     { href: "/admin/emprestimos", label: "Empréstimos", icon: "book-open" },
     { href: "/admin/atrasos", label: "Atrasos", icon: "alarm" },
     { href: "/admin/historico", label: "Histórico", icon: "history" },
+    { href: "/admin/avaliacoes", label: "Avaliações", icon: "star" },
+    { href: "/admin/ranking", label: "Ranking de leitura", icon: "trophy" },
     { href: "/admin/alunos", label: "Alunos", icon: "users" },
     { href: "/admin/professores", label: "Professores", icon: "graduation" },
     { href: "/admin/turmas", label: "Turmas", icon: "school" },

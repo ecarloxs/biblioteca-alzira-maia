@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import {
   Home, Library, LibraryBig, Bookmark, BookOpen, History, AlarmClock, LayoutDashboard, Users,
   GraduationCap, School, ShieldCheck, BarChart3, ScrollText, Settings, Menu, X, LogOut, Search,
+  Trophy, Award, Star,
   type LucideIcon,
 } from "lucide-react";
 import { cn, initials } from "@/lib/utils";
@@ -15,6 +16,7 @@ const ICONS: Record<string, LucideIcon> = {
   home: Home, library: Library, bookmark: Bookmark, "book-open": BookOpen, history: History,
   alarm: AlarmClock, layout: LayoutDashboard, users: Users, graduation: GraduationCap, school: School,
   shield: ShieldCheck, chart: BarChart3, scroll: ScrollText, settings: Settings,
+  trophy: Trophy, award: Award, star: Star,
 };
 
 export function AppShell({
@@ -22,12 +24,14 @@ export function AppShell({
   roleLabel,
   nome,
   nav,
+  notificationBell,
   children,
 }: {
   role: string;
   roleLabel: string;
   nome: string;
   nav: NavItem[];
+  notificationBell?: React.ReactNode;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -124,6 +128,7 @@ export function AppShell({
         </form>
 
         <div className="ml-auto flex items-center gap-3">
+          {notificationBell}
           <div className="hidden text-right leading-tight sm:block">
             <p className="max-w-[12rem] truncate text-sm font-semibold">{nome}</p>
             <p className="text-xs text-muted-foreground">{roleLabel}</p>

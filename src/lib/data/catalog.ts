@@ -7,6 +7,7 @@ export interface CatalogParams {
   q?: string;
   categoria?: string;
   disp?: string;
+  avaliacao?: string;
   ordem?: string;
   page?: number;
   includeInactive?: boolean;
@@ -24,6 +25,7 @@ export async function getCatalog(supabase: SupabaseClient, p: CatalogParams) {
   if (p.categoria) query = query.eq("categoria", p.categoria);
   if (p.disp === "disponiveis") query = query.gt("disponiveis", 0);
   if (p.disp === "indisponiveis") query = query.eq("disponiveis", 0);
+  if (p.avaliacao) query = query.gte("media_avaliacoes", Number(p.avaliacao));
 
   switch (p.ordem) {
     case "autor":
@@ -34,6 +36,12 @@ export async function getCatalog(supabase: SupabaseClient, p: CatalogParams) {
       break;
     case "disponiveis":
       query = query.order("disponiveis", { ascending: false }).order("titulo");
+      break;
+    case "avaliacao":
+      query = query.order("media_avaliacoes", { ascending: false }).order("total_avaliacoes", { ascending: false });
+      break;
+    case "populares":
+      query = query.order("total_emprestimos", { ascending: false });
       break;
     default:
       query = query.order("titulo");

@@ -27,14 +27,21 @@ export interface Livro {
   categoria: string;
   descricao: string | null;
   capa_url: string | null;
+  numero_paginas: number | null;
   ativo: boolean;
 }
+
+export type StatusGeralLivro = "disponivel" | "emprestimo" | "indisponivel";
 
 export interface LivroCatalogo extends Livro {
   total_exemplares: number;
   disponiveis: number;
   reservados: number;
   emprestados: number;
+  status_geral: StatusGeralLivro;
+  total_emprestimos: number;
+  media_avaliacoes: number;
+  total_avaliacoes: number;
 }
 
 export type ExemplarStatus = "disponivel" | "reservado" | "emprestado" | "manutencao" | "perdido" | "inativo";
@@ -139,3 +146,86 @@ export interface AdminDashboard {
 }
 
 export type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+// ----------------------------------------------------------------- Evolução:
+// avaliações, gamificação, ranking, notificações, fila de interesse
+// -----------------------------------------------------------------------
+
+export interface AvaliacaoPublica {
+  id: string;
+  livro_id: string;
+  nota: number;
+  comentario: string | null;
+  created_at: string;
+  autor_anonimizado: string;
+}
+
+export interface VAvaliacaoAdmin {
+  id: string;
+  livro_id: string;
+  nota: number;
+  comentario: string | null;
+  created_at: string;
+  removida: boolean;
+  aluno_id: string;
+  aluno_nome: string;
+  turma_nome: string | null;
+  livro_titulo: string;
+}
+
+export type CriterioConquista = "livros_lidos" | "paginas_lidas" | "avaliacoes_feitas";
+
+export interface Conquista {
+  id: string;
+  chave: string;
+  titulo: string;
+  descricao: string;
+  icone: string;
+  criterio_tipo: CriterioConquista;
+  criterio_valor: number;
+  ordem: number;
+  ativo: boolean;
+}
+
+export interface AlunoConquista {
+  id: string;
+  aluno_id: string;
+  conquista_id: string;
+  conquistada_em: string;
+  conquistas: Conquista;
+}
+
+export type NotificacaoTipo = "reserva" | "prazo" | "devolucao" | "avaliacao" | "conquista" | "atrasos" | "sistema";
+
+export interface Notificacao {
+  id: string;
+  destinatario_id: string;
+  tipo: NotificacaoTipo;
+  titulo: string;
+  mensagem: string;
+  entidade: string | null;
+  entidade_id: string | null;
+  lida: boolean;
+  created_at: string;
+}
+
+export interface FilaInteresse {
+  id: string;
+  aluno_id: string;
+  livro_id: string;
+  created_at: string;
+}
+
+export interface RankingLinha {
+  aluno_id: string;
+  aluno_nome: string;
+  turma_nome: string | null;
+  livros_lidos: number;
+  paginas_lidas: number;
+}
+
+export interface EstatisticasAluno {
+  livros_lidos: number;
+  paginas_lidas: number;
+  avaliacoes_feitas: number;
+}

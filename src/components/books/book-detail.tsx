@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, QrCode } from "lucide-react";
+import { ArrowLeft, BookText, QrCode, Repeat, Star } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionProfile } from "@/lib/auth/session";
 import { getConfiguracoes } from "@/lib/data/config";
@@ -9,9 +9,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, THead, TBody, TR, TH, TD } from "@/components/ui/table";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { StarRating } from "@/components/shared/star-rating";
 import { ReserveButton } from "@/components/reservations/reserve-button";
+import { FilaInteresseButton } from "@/components/reservations/fila-interesse-button";
+import { ReviewsList } from "@/components/reviews/reviews-list";
 import { CONDICAO_LABEL } from "@/lib/constants";
-import type { Exemplar, LivroCatalogo } from "@/types";
+import type { AvaliacaoPublica, Exemplar, LivroCatalogo } from "@/types";
 
 export async function BookDetail({ id, role }: { id: string; role: "aluno" | "professor" }) {
   const supabase = await createClient();
@@ -22,9 +25,12 @@ export async function BookDetail({ id, role }: { id: string; role: "aluno" | "pr
 
   const session = await getSessionProfile();
   const cfg = await getConfiguracoes(supabase);
+  const { data: avaliacoesData } = await supabase.rpc("avaliacoes_publicas", { p_livro_id: id });
+  const avaliacoes = (avaliacoesData ?? []) as AvaliacaoPublica[];
 
   let jaReservou = false;
   let semCadastro = false;
+  let naFila = false;
   if (role === "aluno" && session) {
     const { data: aluno } = await supabase.from("v_alunos").select("id").eq("profile_id", session.user.id).eq("ativo", true).maybeSingle();
     semCadastro = !aluno;
@@ -34,6 +40,14 @@ export async function BookDetail({ id, role }: { id: string; role: "aluno" | "pr
       .eq("livro_id", id)
       .eq("status", "ativa");
     jaReservou = (count ?? 0) > 0;
+    if (aluno) {
+      const { count: filaCount } = await supabase
+        .from("fila_interesse")
+        .select("id", { count: "exact", head: true })
+        .eq("livro_id", id)
+        .eq("aluno_id", aluno.id);
+      naFila = (filaCount ?? 0) > 0;
+    }
   }
 
   let exemplares: Exemplar[] = [];
@@ -57,9 +71,35 @@ export async function BookDetail({ id, role }: { id: string; role: "aluno" | "pr
         </div>
 
         <div>
-          <Badge tone="neutral">{livro.categoria}</Badge>
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge tone="neutral">{livro.categoria}</Badge>
+            <StatusBadge kind="status_geral" value={livro.status_geral} />
+          </div>
           <h1 className="mt-2 text-3xl font-bold leading-tight sm:text-4xl">{livro.titulo}</h1>
           <p className="mt-1 text-lg text-muted-foreground">{livro.autor}</p>
+
+          <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+            {livro.total_avaliacoes > 0 ? (
+              <span className="flex items-center gap-1.5">
+                <StarRating value={livro.media_avaliacoes} size="sm" showValue />
+                <span>
+                  ({livro.total_avaliacoes} avaliação{livro.total_avaliacoes > 1 ? "ões" : ""})
+                </span>
+              </span>
+            ) : (
+              <span className="flex items-center gap-1 italic">
+                <Star className="size-4" /> Sem avaliações ainda
+              </span>
+            )}
+            {livro.numero_paginas && (
+              <span className="flex items-center gap-1.5">
+                <BookText className="size-4" /> {livro.numero_paginas} páginas
+              </span>
+            )}
+            <span className="flex items-center gap-1.5">
+              <Repeat className="size-4" /> Já emprestado {livro.total_emprestimos}x
+            </span>
+          </div>
 
           <dl className="mt-5 grid max-w-md grid-cols-2 gap-3">
             <div className="rounded-lg border bg-card p-4">
@@ -82,18 +122,20 @@ export async function BookDetail({ id, role }: { id: string; role: "aluno" | "pr
                 <p className="rounded-md bg-info-soft p-3 text-sm text-info">
                   Você já reservou este livro. <Link href="/aluno/reservas" className="font-semibold underline">Ver minhas reservas</Link>
                 </p>
-              ) : (
+              ) : disp === 0 ? (
                 <>
-                  <ReserveButton
-                    livroId={livro.id}
-                    titulo={livro.titulo}
-                    autor={livro.autor}
-                    validadeDias={cfg.validade_reserva_dias}
-                    disabled={disp === 0}
-                    className="w-full sm:w-auto"
-                  />
-                  {disp === 0 && <p className="mt-2 text-sm text-muted-foreground">Todos os exemplares estão emprestados ou reservados no momento.</p>}
+                  <p className="mb-2 rounded-md bg-muted p-3 text-sm text-muted-foreground">Indisponível no momento — todos os exemplares estão emprestados ou reservados.</p>
+                  <FilaInteresseButton livroId={livro.id} naFila={naFila} />
                 </>
+              ) : (
+                <ReserveButton
+                  livroId={livro.id}
+                  titulo={livro.titulo}
+                  autor={livro.autor}
+                  validadeDias={cfg.validade_reserva_dias}
+                  disabled={disp === 0}
+                  className="w-full sm:w-auto"
+                />
               )}
             </div>
           )}
@@ -140,6 +182,11 @@ export async function BookDetail({ id, role }: { id: string; role: "aluno" | "pr
           </Table>
         </section>
       )}
+
+      <section className="mt-10 max-w-2xl">
+        <h2 className="mb-3 text-xl font-semibold">Avaliações de quem já leu</h2>
+        <ReviewsList avaliacoes={avaliacoes} />
+      </section>
     </>
   );
 }

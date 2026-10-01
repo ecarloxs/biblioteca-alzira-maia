@@ -37,11 +37,24 @@ const USUARIOS = [
   { role: "aluno", nome: "Diego Farias (Aluno Teste)", email: "aluno4@teste.dev", senha: "Teste@123", matricula: "2024-0004", turma: "5ºA" },
 ];
 
+let _turmasCache = null;
+
+function normaliza(nome) {
+  return nome.replace(/\s+/g, "").toLowerCase();
+}
+
 async function getTurmaIdPorNome(nome) {
-  const { data, error } = await supabase.from("turmas").select("id").eq("nome", nome).maybeSingle();
-  if (error) throw error;
-  if (!data) throw new Error(`Turma "${nome}" não encontrada. Rode as migrations (005_dados_iniciais.sql) antes deste script.`);
-  return data.id;
+  if (!_turmasCache) {
+    const { data, error } = await supabase.from("turmas").select("id, nome");
+    if (error) throw error;
+    _turmasCache = data ?? [];
+  }
+  const alvo = normaliza(nome);
+  const encontrada = _turmasCache.find((t) => normaliza(t.nome) === alvo);
+  if (!encontrada) {
+    throw new Error(`Turma "${nome}" não encontrada. Rode as migrations (005_dados_iniciais.sql) antes deste script.`);
+  }
+  return encontrada.id;
 }
 
 async function jaExiste(email) {

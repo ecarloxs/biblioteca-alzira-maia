@@ -1,15 +1,16 @@
 import Link from "next/link";
-import { AlarmClock, BookOpen, Bookmark, School, Users } from "lucide-react";
+import { AlarmClock, BookOpen, Bookmark, BookText, School, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionProfile } from "@/lib/auth/session";
 import { getMinhasTurmas } from "@/lib/data/professor";
 import { PageHeader } from "@/components/shared/page-header";
 import { StatCard } from "@/components/shared/stat-card";
 import { EmptyState } from "@/components/shared/empty-state";
+import { StatusBadge } from "@/components/shared/status-badge";
 import { Table, THead, TBody, TR, TH, TD } from "@/components/ui/table";
 import { CONDICAO_LABEL } from "@/lib/constants";
-import { formatDateTime } from "@/lib/utils";
-import type { VAluno, VEmprestimo, VReserva } from "@/types";
+import { formatDate, formatDateTime } from "@/lib/utils";
+import type { RankingLinha, VAluno, VEmprestimo, VReserva } from "@/types";
 
 export const metadata = { title: "Início" };
 
@@ -38,6 +39,12 @@ export default async function ProfessorHome() {
   const devolucoesRecentes = (devolucoesRes.data ?? []) as VEmprestimo[];
   const atrasados = emprestimos.filter((e) => e.status_efetivo === "atrasado");
 
+  // ranking_leitura() sem filtro traria a escola inteira — soma por turma que o professor acompanha
+  const rankingPorTurma = await Promise.all(turmas.map((t) => supabase.rpc("ranking_leitura", { p_turma_id: t.id })));
+  const ranking = rankingPorTurma.flatMap((r) => (r.data ?? []) as RankingLinha[]);
+  const paginasLidasTurmas = ranking.reduce((acc, r) => acc + r.paginas_lidas, 0);
+  const livrosLidosTurmas = ranking.reduce((acc, r) => acc + r.livros_lidos, 0);
+
   const porTurma = turmas.map((t) => ({
     turma: t,
     alunos: alunos.filter((a) => a.turma_id === t.id).length,
@@ -58,6 +65,34 @@ export default async function ProfessorHome() {
         <StatCard label="Empréstimos ativos" value={emprestimos.length} icon={<BookOpen />} tone="info" href="/professor/emprestimos" />
         <StatCard label="Atrasados" value={atrasados.length} icon={<AlarmClock />} tone={atrasados.length > 0 ? "danger" : "neutral"} href="/professor/atrasos" />
       </div>
+
+      <div className="mb-8 grid gap-3 sm:grid-cols-2">
+        <StatCard label="📚 Livros lidos pelas turmas" value={livrosLidosTurmas} icon={<BookOpen />} tone="success" />
+        <StatCard label="📄 Páginas lidas pelas turmas" value={paginasLidasTurmas} icon={<BookText />} tone="info" />
+      </div>
+
+      {atrasados.length > 0 && (
+        <section className="mb-8">
+          <h2 className="mb-3 text-xl font-semibold">⚠️ Pendências</h2>
+          <Table>
+            <THead>
+              <TR className="hover:bg-transparent">
+                <TH>Aluno</TH><TH>Livro</TH><TH>Prazo</TH><TH>Status</TH>
+              </TR>
+            </THead>
+            <TBody>
+              {atrasados.map((e) => (
+                <TR key={e.id}>
+                  <TD>{e.aluno_nome ?? "—"}</TD>
+                  <TD className="max-w-[16rem] font-medium">{e.livro_titulo}</TD>
+                  <TD className="whitespace-nowrap">{formatDate(e.prazo_devolucao)}</TD>
+                  <TD><StatusBadge kind="emprestimo" value={e.status_efetivo} /></TD>
+                </TR>
+              ))}
+            </TBody>
+          </Table>
+        </section>
+      )}
 
       <section className="mb-8">
         <h2 className="mb-3 text-xl font-semibold">Minhas turmas</h2>

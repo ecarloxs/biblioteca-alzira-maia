@@ -18,6 +18,7 @@ const EMPTY: LivroInput = {
   isbn: "",
   ano_publicacao: null,
   categoria: "",
+  numero_paginas: null,
   descricao: "",
   capa_url: "",
 };
@@ -33,6 +34,7 @@ export function LivroFormDialog({ livro }: { livro?: Livro }) {
           isbn: livro.isbn ?? "",
           ano_publicacao: livro.ano_publicacao,
           categoria: livro.categoria,
+          numero_paginas: livro.numero_paginas,
           descricao: livro.descricao ?? "",
           capa_url: livro.capa_url ?? "",
         }
@@ -110,6 +112,16 @@ export function LivroFormDialog({ livro }: { livro?: Livro }) {
               max={2100}
               value={form.ano_publicacao ?? ""}
               onChange={(e) => set("ano_publicacao", e.target.value ? Number(e.target.value) : null)}
+            />
+          </Field>
+          <Field label="Número de páginas (opcional)" htmlFor="lv-paginas">
+            <Input
+              id="lv-paginas"
+              type="number"
+              min={1}
+              max={20000}
+              value={form.numero_paginas ?? ""}
+              onChange={(e) => set("numero_paginas", e.target.value ? Number(e.target.value) : null)}
             />
           </Field>
           <Field label="ISBN (opcional)" htmlFor="lv-isbn">

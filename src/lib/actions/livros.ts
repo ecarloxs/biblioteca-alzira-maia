@@ -14,6 +14,7 @@ const livroSchema = z.object({
   isbn: z.string().trim().max(30).optional().or(z.literal("")),
   ano_publicacao: z.coerce.number().int().min(1000).max(2100).optional().nullable(),
   categoria: z.string().trim().min(1, "Informe a categoria.").max(100),
+  numero_paginas: z.coerce.number().int().min(1).max(20000).optional().nullable(),
   descricao: z.string().trim().max(4000).optional().or(z.literal("")),
   capa_url: z.string().trim().url().optional().or(z.literal("")),
 });
@@ -28,6 +29,7 @@ function normalize(input: LivroInput) {
     isbn: input.isbn?.trim() || null,
     ano_publicacao: input.ano_publicacao ?? null,
     categoria: input.categoria.trim(),
+    numero_paginas: input.numero_paginas ?? null,
     descricao: input.descricao?.trim() || null,
     capa_url: input.capa_url?.trim() || null,
   };

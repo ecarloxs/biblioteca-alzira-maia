@@ -38,7 +38,7 @@ export function AlunoReservaCard({ r }: { r: VReserva }) {
   );
 }
 
-export function AlunoEmprestimoCard({ e }: { e: VEmprestimo }) {
+export function AlunoEmprestimoCard({ e, actions }: { e: VEmprestimo; actions?: React.ReactNode }) {
   const aberto = e.status_efetivo === "ativo" || e.status_efetivo === "atrasado";
   const dias = diffDias(hojeISO(), e.prazo_devolucao);
   return (
@@ -80,6 +80,7 @@ export function AlunoEmprestimoCard({ e }: { e: VEmprestimo }) {
                   : `Faltam ${dias} dias.`}
           </p>
         )}
+        {actions && <div className="mt-3">{actions}</div>}
       </div>
     </article>
   );
